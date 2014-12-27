@@ -144,8 +144,8 @@
 
 
 
-;; add-simple-line : Posn Posn Image -> Image
-;; add a black line from p1 to p2 on image
+;; add-simple-line : Image Posn Posn -> Image
+;; add a black line from p1 to p2 on img
 (define (add-simple-line img p1 p2)
   (match-define (posn p1.x p1.y) p1)
   (match-define (posn p2.x p2.y) p2)
