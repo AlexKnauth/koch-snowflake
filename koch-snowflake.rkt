@@ -162,7 +162,7 @@
        (add-simple-line/color 
         (add-k-lines/inner-fractal/multi-color
          (add-half-k-lines/inner-fractal/multi-color
-          img (rest colors) p1 top #;top #;p2)
+          img (rest colors) p1 top top p2)
          colors
          p1 mid-left
          mid-left top
@@ -188,7 +188,8 @@
 (module+ test
   (snowflake 728)
   (snowflake/inner-fractal 728)
-  (snowflake/inner-fractal/multi-color 150 '("transparent" "black")) ; other cool thing
+  (snowflake/inner-fractal/multi-color 150 '("transparent" "black")) ; inside-out-ish
+  (snowflake/inner-fractal/multi-color 150 '("red" "green")) ; multi-color
   (add-k-line (empty-scene 1020 520)
               (make-posn 10 510)
               (make-posn 1010 510))
