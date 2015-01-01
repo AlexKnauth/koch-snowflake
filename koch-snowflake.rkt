@@ -189,7 +189,9 @@
   (snowflake 728)
   (snowflake/inner-fractal 728)
   (snowflake/inner-fractal/multi-color 150 '("transparent" "black")) ; inside-out-ish
-  (snowflake/inner-fractal/multi-color 500 '("red" "green")) ; multi-color
+  (snowflake/inner-fractal/multi-color 500 '("red" "green")) ; 2-color
+  (snowflake/inner-fractal/multi-color 500 '("red" "blue" "green")) ; 3-color
+  (snowflake/inner-fractal/multi-color 100 '("red" "blue" "green" "orange")) ; 4-color
   (add-k-line (empty-scene 1020 520)
               (make-posn 10 510)
               (make-posn 1010 510))
