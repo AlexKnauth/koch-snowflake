@@ -10,7 +10,8 @@
 ;; =================
 ;; Constants:
 
-(define LINE-CUTOFF 3)
+(define line-cutoff 4)
+(define (current-line-cutoff) line-cutoff)
 
 ;; =================
 ;; Functions:
@@ -103,9 +104,19 @@
             (add-k-line/inner-fractal/multi-color scene start stop colors)
             colors rst)]))
 
+;; add-half-k-lines/inner-fractal/multi-color : Image (Listof Color) Posn ... ... -> Image
+(define (add-half-k-lines/inner-fractal/multi-color scene colors . rst-args)
+  (match rst-args
+    [(list) scene]
+    [_ #:when (empty? colors) scene]
+    [(list-rest start stop rst)
+     (apply add-half-k-lines/inner-fractal/multi-color
+            (add-half-k-line/inner-fractal/multi-color scene start stop colors)
+            colors rst)]))
+
 
 (define (add-k-line img p1 p2)
-  (if (<= (distance p1 p2) LINE-CUTOFF)
+  (if (<= (distance p1 p2) (current-line-cutoff))
       (add-simple-line img p1 p2)
       (local [(define dp (d p1 p2))
               (define mid-point
@@ -127,16 +138,14 @@
 
 ;; add-k-line/inner-fractal/multi-color : Image Posn Posn (Listof Color) -> Image
 (define (add-k-line/inner-fractal/multi-color img p1 p2 colors)
-  (add-half-k-line/inner-fractal/multi-color
-   (add-half-k-line/inner-fractal/multi-color
-    img p1 p2 colors) p2 p1 colors))
+  (add-half-k-lines/inner-fractal/multi-color img colors p1 p2 p2 p1))
 
 
 ;; add-half-k-line/inner-fractal/multi-color : Image Posn Posn (Listof Color) -> Image
 (define (add-half-k-line/inner-fractal/multi-color img p1 p2 colors)
   (cond
     [(empty? colors) img]
-    [(<= (distance p1 p2) LINE-CUTOFF)
+    [(<= (distance p1 p2) (current-line-cutoff))
      (add-simple-line/color img p1 p2 (first colors))]
     [else
      (local [(define dp (d p1 p2))
@@ -152,11 +161,8 @@
                (p+ mid-left (p* dp 1/3)))]
        (add-simple-line/color 
         (add-k-lines/inner-fractal/multi-color
-         (add-k-lines/inner-fractal/multi-color
-          img
-          (rest colors)
-          p1 top
-          top p2)
+         (add-half-k-lines/inner-fractal/multi-color
+          img (rest colors) p1 top #;top #;p2)
          colors
          p1 mid-left
          mid-left top
@@ -176,12 +182,13 @@
 (define (add-simple-line/color img p1 p2 color)
   (match-define (posn p1.x p1.y) p1)
   (match-define (posn p2.x p2.y) p2)
-  (add-line img p1.x p1.y p2.x p2.y color))
+  (scene+line img p1.x p1.y p2.x p2.y color))
 
 
 (module+ test
   (snowflake 728)
   (snowflake/inner-fractal 728)
+  (snowflake/inner-fractal/multi-color 150 '("transparent" "black")) ; other cool thing
   (add-k-line (empty-scene 1020 520)
               (make-posn 10 510)
               (make-posn 1010 510))
