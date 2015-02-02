@@ -10,15 +10,14 @@
 ;; =================
 ;; Constants:
 
-(define line-cutoff 4)
-(define (current-line-cutoff) line-cutoff)
+(define default-line-cutoff 4)
 
 ;; =================
 ;; Functions:
 
 ;; snowflake : Positive-Real -> Image
 ;; a function to combine lines into snowflake
-(define (snowflake n)
+(define (snowflake n #:cutoff [line-cutoff default-line-cutoff])
   (local [(define MTS 
             (rectangle (+ n 20) (+ (/ (* 2 n (sqrt 3)) 3) 20) 0 "white"))
           (define bottom-left
@@ -34,14 +33,15 @@
      MTS
      bottom-left top
      top bottom-right
-     bottom-right bottom-left)))
+     bottom-right bottom-left
+     #:cutoff line-cutoff)))
 
 ;; snowflake/inner-fractal : Positive-Real -> Image
-(define (snowflake/inner-fractal n)
-  (snowflake/inner-fractal/multi-color n '("black")))
+(define (snowflake/inner-fractal n #:cutoff [line-cutoff default-line-cutoff])
+  (snowflake/inner-fractal/multi-color n '("black") #:cutoff line-cutoff))
 
 ;; snowflake/inner-fractal/multi-color : Positive-Real (Listof Color) -> Image
-(define (snowflake/inner-fractal/multi-color n colors)
+(define (snowflake/inner-fractal/multi-color n colors #:cutoff [line-cutoff default-line-cutoff])
   (local [(define width (+ n 20))
           (define height (+ (/ (* 2 n (sqrt 3)) 3) 20))
           (define MTS 
@@ -66,6 +66,7 @@
                   (- height 10)))]
     (add-simple-lines/color
      (add-k-lines/inner-fractal/multi-color
+      #:cutoff line-cutoff
       MTS
       colors
       bottom-left top
@@ -87,36 +88,39 @@
     [(list-rest start stop rst)
      (apply add-simple-lines/color (add-simple-line/color scene start stop color) color rst)]))
 
-;; add-k-lines : Image Posn Posn ... ... -> Image
-(define (add-k-lines scene . rst-args)
+;; add-k-lines : Image Posn Posn ... ... #:cutoff PosReal -> Image
+(define (add-k-lines scene #:cutoff line-cutoff . rst-args)
   (match rst-args
     [(list) scene]
     [(list-rest start stop rst)
-     (apply add-k-lines (add-k-line scene start stop) rst)]))
+     (apply add-k-lines (add-k-line scene start stop #:cutoff line-cutoff) rst #:cutoff line-cutoff)]
+    ))
 
-;; add-k-lines/inner-fractal/multi-color : Image (Listof Color) Posn Posn ... ... -> Image
-(define (add-k-lines/inner-fractal/multi-color scene colors . rst-args)
-  (match rst-args
-    [(list) scene]
-    [_ #:when (empty? colors) scene]
-    [(list-rest start stop rst)
-     (apply add-k-lines/inner-fractal/multi-color
-            (add-k-line/inner-fractal/multi-color scene start stop colors)
-            colors rst)]))
-
-;; add-half-k-lines/inner-fractal/multi-color : Image (Listof Color) Posn ... ... -> Image
-(define (add-half-k-lines/inner-fractal/multi-color scene colors . rst-args)
+;; add-k-lines/inner-fractal/multi-color :
+;; Image (Listof Color) Posn Posn ... ... #:cutoff PosReal -> Image
+(define (add-k-lines/inner-fractal/multi-color scene colors #:cutoff line-cutoff . rst-args)
   (match rst-args
     [(list) scene]
     [_ #:when (empty? colors) scene]
     [(list-rest start stop rst)
-     (apply add-half-k-lines/inner-fractal/multi-color
-            (add-half-k-line/inner-fractal/multi-color scene start stop colors)
+     (apply add-k-lines/inner-fractal/multi-color #:cutoff line-cutoff
+            (add-k-line/inner-fractal/multi-color scene start stop colors #:cutoff line-cutoff)
+            colors rst)]))
+
+;; add-half-k-lines/inner-fractal/multi-color :
+;; Image (Listof Color) Posn ... ... #:cutoff PosReal -> Image
+(define (add-half-k-lines/inner-fractal/multi-color scene colors #:cutoff line-cutoff . rst-args)
+  (match rst-args
+    [(list) scene]
+    [_ #:when (empty? colors) scene]
+    [(list-rest start stop rst)
+     (apply add-half-k-lines/inner-fractal/multi-color #:cutoff line-cutoff
+            (add-half-k-line/inner-fractal/multi-color scene start stop colors #:cutoff line-cutoff)
             colors rst)]))
 
 
-(define (add-k-line img p1 p2)
-  (if (<= (distance p1 p2) (current-line-cutoff))
+(define (add-k-line img p1 p2 #:cutoff line-cutoff)
+  (if (<= (distance p1 p2) line-cutoff)
       (add-simple-line img p1 p2)
       (local [(define dp (d p1 p2))
               (define mid-point
@@ -130,22 +134,24 @@
               (define mid-right
                 (p+ mid-left (p* dp 1/3)))]
         (add-k-lines
+         #:cutoff line-cutoff
          img
          p1 mid-left
          mid-left top
          top mid-right
          mid-right p2))))
 
-;; add-k-line/inner-fractal/multi-color : Image Posn Posn (Listof Color) -> Image
-(define (add-k-line/inner-fractal/multi-color img p1 p2 colors)
-  (add-half-k-lines/inner-fractal/multi-color img colors p1 p2 p2 p1))
+;; add-k-line/inner-fractal/multi-color : Image Posn Posn (Listof Color) #:cutoff PosReal -> Image
+(define (add-k-line/inner-fractal/multi-color img p1 p2 colors #:cutoff line-cutoff)
+  (add-half-k-lines/inner-fractal/multi-color img colors p1 p2 p2 p1 #:cutoff line-cutoff))
 
 
-;; add-half-k-line/inner-fractal/multi-color : Image Posn Posn (Listof Color) -> Image
-(define (add-half-k-line/inner-fractal/multi-color img p1 p2 colors)
+;; add-half-k-line/inner-fractal/multi-color :
+;; Image Posn Posn (Listof Color) #:cutoff PosReal -> Image
+(define (add-half-k-line/inner-fractal/multi-color img p1 p2 colors #:cutoff line-cutoff)
   (cond
     [(empty? colors) img]
-    [(<= (distance p1 p2) (current-line-cutoff))
+    [(<= (distance p1 p2) line-cutoff)
      (add-simple-line/color img p1 p2 (first colors))]
     [else
      (local [(define dp (d p1 p2))
@@ -159,9 +165,11 @@
                (p+ p1 (p* dp 1/3)))
              (define mid-right
                (p+ mid-left (p* dp 1/3)))]
-       (add-simple-line/color 
+       (add-simple-line/color
         (add-k-lines/inner-fractal/multi-color
+         #:cutoff line-cutoff
          (add-half-k-lines/inner-fractal/multi-color
+          #:cutoff line-cutoff
           img (rest colors) p1 top top p2)
          colors
          p1 mid-left
@@ -189,10 +197,12 @@
   (snowflake 728)
   (snowflake/inner-fractal 728)
   (snowflake/inner-fractal/multi-color 150 '("transparent" "black")) ; inside-out-ish
-  (snowflake/inner-fractal/multi-color 500 '("red" "green")) ; 2-color
-  (snowflake/inner-fractal/multi-color 500 '("red" "blue" "green")) ; 3-color
-  (snowflake/inner-fractal/multi-color 100 '("red" "blue" "green" "orange")) ; 4-color
-  (add-k-line (empty-scene 1020 520)
+  (snowflake/inner-fractal/multi-color 500 '("red" "green") #:cutoff 12) ; 2-color
+  (snowflake/inner-fractal/multi-color 500 '("red" "blue" "green") #:cutoff 12) ; 3-color
+  (snowflake/inner-fractal/multi-color 100 '("red" "blue" "green" "orange") #:cutoff 12) ; 4-color
+  (snowflake/inner-fractal/multi-color 500 '("red" "orange" "yellow" "green" "blue" "purple")
+                                       #:cutoff 20) ; 6-color
+  (add-k-line (empty-scene 1020 520) #:cutoff default-line-cutoff
               (make-posn 10 510)
               (make-posn 1010 510))
   )
