@@ -17,18 +17,20 @@
 
 ;; snowflake : Positive-Real -> Image
 ;; a function to combine lines into snowflake
-(define (snowflake n #:cutoff [line-cutoff default-line-cutoff])
-  (local [(define MTS 
-            (rectangle (+ n 20) (+ (/ (* 2 n (sqrt 3)) 3) 20) 0 "white"))
+(define (snowflake w #:cutoff [line-cutoff default-line-cutoff])
+  (local [(define h (* w 4/3 (/ (sqrt 3) 2)))
+          (define m 10)
+          (define MTS 
+            (rectangle (+ m w m) (+ m h m) 0 "transparent"))
           (define bottom-left
-            (posn 10
-                  (+ (* n (/ (sqrt 3) 2)) 10)))
+            (posn (+ m)
+                  (+ m (* 3/4 h))))
           (define bottom-right
-            (posn (+ n 10)
-                  (+ (* n (/ (sqrt 3) 2)) 10)))
+            (posn (+ m w)
+                  (+ m (* 3/4 h))))
           (define top
-            (posn (+ 10 (/ n 2))
-                  10))]
+            (posn (+ m (* 1/2 w))
+                  (+ m)))]
     (add-k-lines
      MTS
      bottom-left top
@@ -41,29 +43,29 @@
   (snowflake/inner-fractal/multi-color n '("black") #:cutoff line-cutoff))
 
 ;; snowflake/inner-fractal/multi-color : Positive-Real (Listof Color) -> Image
-(define (snowflake/inner-fractal/multi-color n colors #:cutoff [line-cutoff default-line-cutoff])
-  (local [(define width (+ n 20))
-          (define height (+ (/ (* 2 n (sqrt 3)) 3) 20))
+(define (snowflake/inner-fractal/multi-color w colors #:cutoff [line-cutoff default-line-cutoff])
+  (local [(define h (* w 4/3 (/ (sqrt 3) 2)))
+          (define m 50)
           (define MTS 
-            (rectangle width height 0 "transparent"))
+            (rectangle (+ m w m) (+ m h m) 0 "transparent"))
           (define bottom-left
-            (posn 10
-                  (+ (* n (/ (sqrt 3) 2)) 10)))
+            (posn (+ m)
+                  (+ m (* 3/4 h))))
           (define bottom-right
-            (posn (+ n 10)
-                  (+ (* n (/ (sqrt 3) 2)) 10)))
+            (posn (+ m w)
+                  (+ m (* 3/4 h))))
           (define top
-            (posn (+ 10 (/ n 2))
-                  10))
+            (posn (+ m (* 1/2 w))
+                  (+ m)))
           (define top-left
-            (posn 10
-                  (- height (+ (* n (/ (sqrt 3) 2)) 10))))
+            (posn (+ m)
+                  (+ m (* 1/4 h))))
           (define top-right
-            (posn (+ n 10)
-                  (- height (+ (* n (/ (sqrt 3) 2)) 10))))
+            (posn (+ m w)
+                  (+ m (* 1/4 h))))
           (define bottom
-            (posn (+ 10 (/ n 2))
-                  (- height 10)))]
+            (posn (+ m (* 1/2 w))
+                  (+ m h)))]
     (for/fold ([img MTS]) ([color (in-list (reverse colors))]
                            [layer (in-list (reverse (range (length colors))))])
       (cond [(equal? "transparent" color) img]
@@ -210,7 +212,7 @@
   (snowflake/inner-fractal/multi-color 500 '("red" "blue" "green") #:cutoff 12) ; 3-color
   (snowflake/inner-fractal/multi-color 100 '("red" "blue" "green" "orange") #:cutoff 12) ; 4-color
   (snowflake/inner-fractal/multi-color 500 '("red" "orange" "yellow" "green" "blue" "purple")
-                                       #:cutoff 20) ; 6-color
+                                       #:cutoff 10) ; 6-color
   (add-k-line (empty-scene 1020 520) #:cutoff default-line-cutoff
               (make-posn 10 510)
               (make-posn 1010 510))
