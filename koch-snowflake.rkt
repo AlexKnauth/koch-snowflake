@@ -45,7 +45,7 @@
   (local [(define width (+ n 20))
           (define height (+ (/ (* 2 n (sqrt 3)) 3) 20))
           (define MTS 
-            (rectangle width height 0 "white"))
+            (rectangle width height 0 "transparent"))
           (define bottom-left
             (posn 10
                   (+ (* n (/ (sqrt 3) 2)) 10)))
@@ -64,18 +64,26 @@
           (define bottom
             (posn (+ 10 (/ n 2))
                   (- height 10)))]
-    (add-simple-lines/color
-     (add-k-lines/inner-fractal/multi-color
-      #:cutoff line-cutoff
-      MTS
-      colors
-      bottom-left top
-      top bottom-right
-      bottom-right bottom-left)
-     (first colors)
-     top-left top-right
-     top-right bottom
-     bottom top-left)))
+    (for/fold ([img MTS]) ([color (in-list (reverse colors))]
+                           [layer (in-list (reverse (range (length colors))))])
+      (cond [(equal? "transparent" color) img]
+            [else
+             (define img+k-lines
+               (add-k-lines/inner-fractal/layer
+                #:cutoff line-cutoff
+                img
+                layer color
+                bottom-left top
+                top bottom-right
+                bottom-right bottom-left))
+             (cond [(= 0 layer)
+                    (add-simple-lines/color
+                     img+k-lines
+                     color
+                     top-left top-right
+                     top-right bottom
+                     bottom top-left)]
+                   [else img+k-lines])]))))
 
 ;; add-simple-lines : Image Posn Posn ... ... -> Image
 (define (add-simple-lines scene . rst-args)
@@ -96,27 +104,25 @@
      (apply add-k-lines (add-k-line scene start stop #:cutoff line-cutoff) rst #:cutoff line-cutoff)]
     ))
 
-;; add-k-lines/inner-fractal/multi-color :
-;; Image (Listof Color) Posn Posn ... ... #:cutoff PosReal -> Image
-(define (add-k-lines/inner-fractal/multi-color scene colors #:cutoff line-cutoff . rst-args)
+;; add-k-lines/inner-fractal/layer :
+;; Image Natural Color Posn Posn ... ... #:cutoff PosReal -> Image
+(define (add-k-lines/inner-fractal/layer scene layer color #:cutoff line-cutoff . rst-args)
   (match rst-args
     [(list) scene]
-    [_ #:when (empty? colors) scene]
     [(list-rest start stop rst)
-     (apply add-k-lines/inner-fractal/multi-color #:cutoff line-cutoff
-            (add-k-line/inner-fractal/multi-color scene start stop colors #:cutoff line-cutoff)
-            colors rst)]))
+     (apply add-k-lines/inner-fractal/layer #:cutoff line-cutoff
+            (add-k-line/inner-fractal/layer scene start stop layer color #:cutoff line-cutoff)
+            layer color rst)]))
 
-;; add-half-k-lines/inner-fractal/multi-color :
-;; Image (Listof Color) Posn ... ... #:cutoff PosReal -> Image
-(define (add-half-k-lines/inner-fractal/multi-color scene colors #:cutoff line-cutoff . rst-args)
+;; add-half-k-lines/inner-fractal/layer :
+;; Image Natural Color Posn ... ... #:cutoff PosReal -> Image
+(define (add-half-k-lines/inner-fractal/layer scene layer color #:cutoff line-cutoff . rst-args)
   (match rst-args
     [(list) scene]
-    [_ #:when (empty? colors) scene]
     [(list-rest start stop rst)
-     (apply add-half-k-lines/inner-fractal/multi-color #:cutoff line-cutoff
-            (add-half-k-line/inner-fractal/multi-color scene start stop colors #:cutoff line-cutoff)
-            colors rst)]))
+     (apply add-half-k-lines/inner-fractal/layer #:cutoff line-cutoff
+            (add-half-k-line/inner-fractal/layer scene start stop layer color #:cutoff line-cutoff)
+            layer color rst)]))
 
 
 (define (add-k-line img p1 p2 #:cutoff line-cutoff)
@@ -141,18 +147,18 @@
          top mid-right
          mid-right p2))))
 
-;; add-k-line/inner-fractal/multi-color : Image Posn Posn (Listof Color) #:cutoff PosReal -> Image
-(define (add-k-line/inner-fractal/multi-color img p1 p2 colors #:cutoff line-cutoff)
-  (add-half-k-lines/inner-fractal/multi-color img colors p1 p2 p2 p1 #:cutoff line-cutoff))
+;; add-k-line/inner-fractal/layer : Image Posn Posn Natural Color #:cutoff PosReal -> Image
+(define (add-k-line/inner-fractal/layer img p1 p2 layer color #:cutoff line-cutoff)
+  (add-half-k-lines/inner-fractal/layer img layer color p1 p2 p2 p1 #:cutoff line-cutoff))
 
 
-;; add-half-k-line/inner-fractal/multi-color :
-;; Image Posn Posn (Listof Color) #:cutoff PosReal -> Image
-(define (add-half-k-line/inner-fractal/multi-color img p1 p2 colors #:cutoff line-cutoff)
+;; add-half-k-line/inner-fractal/layer :
+;; Image Posn Posn Natural Color #:cutoff PosReal -> Image
+(define (add-half-k-line/inner-fractal/layer img p1 p2 layer color #:cutoff line-cutoff)
   (cond
-    [(empty? colors) img]
     [(<= (distance p1 p2) line-cutoff)
-     (add-simple-line/color img p1 p2 (first colors))]
+     (cond [(= 0 layer) (add-simple-line/color img p1 p2 color)]
+           [else img])]
     [else
      (local [(define dp (d p1 p2))
              (define mid-point
@@ -165,19 +171,22 @@
                (p+ p1 (p* dp 1/3)))
              (define mid-right
                (p+ mid-left (p* dp 1/3)))]
-       (add-simple-line/color
-        (add-k-lines/inner-fractal/multi-color
-         #:cutoff line-cutoff
-         (add-half-k-lines/inner-fractal/multi-color
-          #:cutoff line-cutoff
-          img (rest colors) p1 top top p2)
-         colors
-         p1 mid-left
-         mid-left top
-         top mid-right
-         mid-right p2)
-        p1 p2
-        (first colors)))]))
+       (define img2
+         (cond [(= 0 layer)
+                (add-simple-line/color
+                 img p1 p2 color)]
+               [else
+                (add-half-k-lines/inner-fractal/layer
+                 #:cutoff line-cutoff
+                 img (sub1 layer) color p1 top top p2)]))
+       (add-k-lines/inner-fractal/layer
+        #:cutoff line-cutoff
+        img2
+        layer color
+        p1 mid-left
+        mid-left top
+        top mid-right
+        mid-right p2))]))
 
 
 
