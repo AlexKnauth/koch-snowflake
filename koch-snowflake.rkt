@@ -45,7 +45,10 @@
 ;; snowflake/inner-fractal/multi-color : Positive-Real (Listof Color) -> Image
 (define (snowflake/inner-fractal/multi-color w colors #:cutoff [line-cutoff default-line-cutoff])
   (local [(define h (* w 4/3 (/ (sqrt 3) 2)))
-          (define m 50)
+          ;; r1 = h/2
+          ;; r2 = r1*h/a = r1*2/√3 = r1/[cos(30º)]
+          ;; r3 = r2*h/a = 
+          (define m (+ 10 (* w 1/2 1/2)))
           (define MTS 
             (rectangle (+ m w m) (+ m h m) 0 "transparent"))
           (define bottom-left
