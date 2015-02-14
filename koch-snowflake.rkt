@@ -6,16 +6,13 @@
          racket/list
          postfix-dot-notation
          "posn.rkt"
+         "utils.rkt"
          )
 
 ;; =================
 ;; Constants:
 
 (define default-line-cutoff 4)
-
-(define √3 (√ 3))
-(define √3/2 {√3 / 2})
-(define √3/6 {√3 / 6})
 
 ;; =================
 ;; Functions:
@@ -86,7 +83,7 @@
                 bottom-left top
                 top bottom-right
                 bottom-right bottom-left))
-             (cond [(= 0 layer)
+             (cond [{layer = 0}
                     (add-simple-lines/color
                      img+k-lines
                      color
@@ -94,17 +91,6 @@
                      top-right bottom
                      bottom top-left)]
                    [else img+k-lines])]))))
-
-;; add-simple-lines : Image Posn Posn ... ... -> Image
-(define (add-simple-lines scene . rst-args)
-  (apply add-simple-lines/color scene "black" rst-args))
-
-;; add-simple-lines/color : Image Color Posn Posn ... ... -> Image
-(define (add-simple-lines/color scene color . rst-args)
-  (match rst-args
-    [(list) scene]
-    [(list-rest start stop rst)
-     (apply add-simple-lines/color (add-simple-line/color scene start stop color) color rst)]))
 
 ;; add-k-lines : Image Posn Posn ... ... #:cutoff PosReal -> Image
 (define (add-k-lines scene #:cutoff line-cutoff . rst-args)
@@ -137,7 +123,7 @@
 
 (define (add-k-line img p1 p2 #:cutoff line-cutoff)
   (if {distance(p1 p2) <= line-cutoff}
-      (add-simple-line img p1 p2)
+      (add-simple-line/color img p1 p2 "black")
       (local [(define dp (d p1 p2))
               (define mid-point
                 {p1 + {1/2 * dp}})
@@ -194,16 +180,6 @@
         top mid-right
         mid-right p2))]))
 
-
-
-;; add-simple-line : Image Posn Posn -> Image
-;; add a black line from p1 to p2 on img
-(define (add-simple-line img p1 p2)
-  (add-simple-line/color img p1 p2 "black"))
-
-;; add-simple-line/color : Image Posn Posn Color -> Image
-(define (add-simple-line/color img p1 p2 color)
-  (scene+line img p1.x p1.y p2.x p2.y color))
 
 
 (module+ test
