@@ -13,7 +13,7 @@
 
 (define default-line-cutoff 4)
 
-(define √3 (sqrt 3))
+(define √3 (√ 3))
 (define √3/2 {√3 / 2})
 (define √3/6 {√3 / 6})
 
@@ -139,13 +139,10 @@
   (if {distance(p1 p2) <= line-cutoff}
       (add-simple-line img p1 p2)
       (local [(define dp (d p1 p2))
-              (define + p+)
-              (define * p*)
               (define mid-point
                 {p1 + {1/2 * dp}})
               (define top
-                {mid-point + {√3/6 * (posn (dy p1 p2)
-                                           (- (dx p1 p2)))}})
+                {mid-point + {√3/6 * (posn dp.y (- dp.x))}})
               (define mid-left
                 {p1 + {1/3 * dp}})
               (define mid-right
@@ -172,13 +169,10 @@
            [else img])]
     [else
      (local [(define dp (d p1 p2))
-             (define + p+)
-             (define * p*)
              (define mid-point
                {p1 + {1/2 * dp}})
              (define top
-               {mid-point + {√3/6 * (posn (dy p1 p2)
-                                          (- (dx p1 p2)))}})
+               {mid-point + {√3/6 * (posn dp.y (- dp.x))}})
              (define mid-left
                {p1 + {1/3 * dp}})
              (define mid-right
@@ -209,7 +203,7 @@
 
 ;; add-simple-line/color : Image Posn Posn Color -> Image
 (define (add-simple-line/color img p1 p2 color)
-  (scene+line img p1.posn-x p1.posn-y p2.posn-x p2.posn-y color))
+  (scene+line img p1.x p1.y p2.x p2.y color))
 
 
 (module+ test
