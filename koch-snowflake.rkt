@@ -1,9 +1,10 @@
-#lang racket/base
+#lang sweet-exp racket/base
 
 (require 2htdp/image
          racket/local
          racket/match
          racket/list
+         postfix-dot-notation
          "posn.rkt"
          )
 
@@ -12,25 +13,29 @@
 
 (define default-line-cutoff 4)
 
+(define √3 (sqrt 3))
+(define √3/2 {√3 / 2})
+(define √3/6 {√3 / 6})
+
 ;; =================
 ;; Functions:
 
 ;; snowflake : Positive-Real -> Image
 ;; a function to combine lines into snowflake
 (define (snowflake w #:cutoff [line-cutoff default-line-cutoff])
-  (local [(define h (* w 4/3 (/ (sqrt 3) 2)))
+  (local [(define h {w * 4/3 * √3/2})
           (define m 10)
           (define MTS 
-            (rectangle (+ m w m) (+ m h m) 0 "transparent"))
+            (rectangle {m + w + m} {m + h + m} 0 "transparent"))
           (define bottom-left
-            (posn (+ m)
-                  (+ m (* 3/4 h))))
+            (posn m
+                  {m + {3/4 * h}}))
           (define bottom-right
-            (posn (+ m w)
-                  (+ m (* 3/4 h))))
+            (posn {m + w}
+                  {m + {3/4 * h}}))
           (define top
-            (posn (+ m (* 1/2 w))
-                  (+ m)))]
+            (posn {m + {1/2 * w}}
+                  m))]
     (add-k-lines
      MTS
      bottom-left top
@@ -44,31 +49,31 @@
 
 ;; snowflake/inner-fractal/multi-color : Positive-Real (Listof Color) -> Image
 (define (snowflake/inner-fractal/multi-color w colors #:cutoff [line-cutoff default-line-cutoff])
-  (local [(define h (* w 4/3 (/ (sqrt 3) 2)))
+  (local [(define h {w * 4/3 * √3/2})
           ;; r1 = h/2
           ;; r2 = r1*h/a = r1*2/√3 = r1/[cos(30º)]
           ;; r3 = r2*h/a = 
-          (define m (+ 10 (* w 1/2 1/2)))
+          (define m {10 + {1/2 * {w / 2}}})
           (define MTS 
-            (rectangle (+ m w m) (+ m h m) 0 "transparent"))
+            (rectangle {m + w + m} {m + h + m} 0 "transparent"))
           (define bottom-left
-            (posn (+ m)
-                  (+ m (* 3/4 h))))
+            (posn m
+                  {m + {3/4 * h}}))
           (define bottom-right
-            (posn (+ m w)
-                  (+ m (* 3/4 h))))
+            (posn {m + w}
+                  {m + {3/4 * h}}))
           (define top
-            (posn (+ m (* 1/2 w))
-                  (+ m)))
+            (posn {m + {1/2 * w}}
+                  m))
           (define top-left
-            (posn (+ m)
-                  (+ m (* 1/4 h))))
+            (posn m
+                  {m + {1/4 * h}}))
           (define top-right
-            (posn (+ m w)
-                  (+ m (* 1/4 h))))
+            (posn {m + w}
+                  {m + {1/4 * h}}))
           (define bottom
-            (posn (+ m (* 1/2 w))
-                  (+ m h)))]
+            (posn {m + {1/2 * w}}
+                  {m + h}))]
     (for/fold ([img MTS]) ([color (in-list (reverse colors))]
                            [layer (in-list (reverse (range (length colors))))])
       (cond [(equal? "transparent" color) img]
@@ -131,19 +136,20 @@
 
 
 (define (add-k-line img p1 p2 #:cutoff line-cutoff)
-  (if (<= (distance p1 p2) line-cutoff)
+  (if {distance(p1 p2) <= line-cutoff}
       (add-simple-line img p1 p2)
       (local [(define dp (d p1 p2))
+              (define + p+)
+              (define * p*)
               (define mid-point
-                (p+ p1 (p* dp 1/2)))
+                {p1 + {1/2 * dp}})
               (define top
-                (p+ mid-point (p* (posn (dy p1 p2)
-                                        (- (dx p1 p2)))
-                                  (/ (sqrt 3) 6))))
+                {mid-point + {√3/6 * (posn (dy p1 p2)
+                                           (- (dx p1 p2)))}})
               (define mid-left
-                (p+ p1 (p* dp 1/3)))
+                {p1 + {1/3 * dp}})
               (define mid-right
-                (p+ mid-left (p* dp 1/3)))]
+                {mid-left + {1/3 * dp}})]
         (add-k-lines
          #:cutoff line-cutoff
          img
@@ -161,23 +167,24 @@
 ;; Image Posn Posn Natural Color #:cutoff PosReal -> Image
 (define (add-half-k-line/inner-fractal/layer img p1 p2 layer color #:cutoff line-cutoff)
   (cond
-    [(<= (distance p1 p2) line-cutoff)
-     (cond [(= 0 layer) (add-simple-line/color img p1 p2 color)]
+    [{distance(p1 p2) <= line-cutoff}
+     (cond [{layer = 0} (add-simple-line/color img p1 p2 color)]
            [else img])]
     [else
      (local [(define dp (d p1 p2))
+             (define + p+)
+             (define * p*)
              (define mid-point
-               (p+ p1 (p* dp 1/2)))
+               {p1 + {1/2 * dp}})
              (define top
-               (p+ mid-point (p* (posn (dy p1 p2)
-                                       (- (dx p1 p2)))
-                                 (/ (sqrt 3) 6))))
+               {mid-point + {√3/6 * (posn (dy p1 p2)
+                                          (- (dx p1 p2)))}})
              (define mid-left
-               (p+ p1 (p* dp 1/3)))
+               {p1 + {1/3 * dp}})
              (define mid-right
-               (p+ mid-left (p* dp 1/3)))]
+               {mid-left + {1/3 * dp}})]
        (define img2
-         (cond [(= 0 layer)
+         (cond [{layer = 0}
                 (add-simple-line/color
                  img p1 p2 color)]
                [else
@@ -202,9 +209,7 @@
 
 ;; add-simple-line/color : Image Posn Posn Color -> Image
 (define (add-simple-line/color img p1 p2 color)
-  (match-define (posn p1.x p1.y) p1)
-  (match-define (posn p2.x p2.y) p2)
-  (scene+line img p1.x p1.y p2.x p2.y color))
+  (scene+line img p1.posn-x p1.posn-y p2.posn-x p2.posn-y color))
 
 
 (module+ test
