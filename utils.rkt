@@ -7,6 +7,8 @@
          postfix-dot-notation
          "posn.rkt")
 
+(define default-line-cutoff 4)
+
 (define √3 (√ 3))
 (define √3/2 {√3 / 2})
 (define √3/6 {√3 / 6})
