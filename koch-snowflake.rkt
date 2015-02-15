@@ -20,6 +20,8 @@ module+ test
   (snowflake/inner-fractal/multi-color 100 '("red" "blue" "green" "orange") #:cutoff 12) ; 4-color
   (snowflake/inner-fractal/multi-color 500 '("red" "orange" "yellow" "green" "blue" "purple")
                                        #:cutoff 10) ; 6-color
+  (snowflake/inner-fractal/multi-color 500 '("red" "transparent" "yellow" "green" "blue" "purple")
+                                       #:cutoff 10) ; 6-color-minus-orange
   (add-k-line empty-scene(1020 520) #:cutoff default-line-cutoff
               posn(10 510)
               posn(1010 510))
