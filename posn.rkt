@@ -8,7 +8,7 @@ require racket/match
         postfix-dot-notation
         prefix-in rkt: racket/base
 
-(struct posn (x y) #:transparent #:extra-constructor-name make-posn)
+struct posn (x y) #:transparent #:extra-constructor-name make-posn
 
 define p posn
 define x posn-x
