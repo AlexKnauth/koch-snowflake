@@ -9,6 +9,7 @@ require 2htdp/image
         racket/match
         racket/list
         postfix-dot-notation
+        my-cond/iffy
         "posn.rkt"
         "utils.rkt"
 
@@ -43,8 +44,8 @@ define (add-k-lines scene #:cutoff line-cutoff . rst-args)
      (apply add-k-lines (add-k-line scene start stop #:cutoff line-cutoff) rst #:cutoff line-cutoff)]
 
 define (add-k-line img p1 p2 #:cutoff line-cutoff)
-  cond
-    {distance(p1 p2) <= line-cutoff}
+  my-cond
+    if {distance(p1 p2) <= line-cutoff}
       (add-simple-line/color img p1 p2 "black")
     else
       define ∆p (∆ p1 p2)
