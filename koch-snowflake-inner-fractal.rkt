@@ -12,6 +12,8 @@ require 2htdp/image
         racket/match
         racket/list
         postfix-dot-notation
+        my-cond
+        my-cond/iffy
         "posn.rkt"
         "utils.rkt"
 
@@ -48,24 +50,27 @@ define (snowflake/inner-fractal/multi-color w colors #:cutoff [line-cutoff defau
          {m + h}
   for/fold ([img MTS]) ([color (in-list reverse(colors))]
                         [layer (in-list reverse(range(length(colors))))])
-    cond [(equal? "transparent" color) img]
-         [else
-          (define img+k-lines
-            (add-k-lines/inner-fractal/layer
-             #:cutoff line-cutoff
-             img
-             layer color
-             bottom-left top
-             top bottom-right
-             bottom-right bottom-left))
-          (cond [{layer = 0}
-                 (add-simple-lines/color
-                  img+k-lines
-                  color
-                  top-left top-right
-                  top-right bottom
-                  bottom top-left)]
-                [else img+k-lines])]
+    my-cond
+      if (equal? "transparent" color)
+        img
+      else
+        define img+k-lines
+         (add-k-lines/inner-fractal/layer
+          #:cutoff line-cutoff
+          img
+          layer color
+          bottom-left top
+          top bottom-right
+          bottom-right bottom-left)
+        my-cond
+          if {layer = 0}
+            (add-simple-lines/color
+             img+k-lines
+             color
+             top-left top-right
+             top-right bottom
+             bottom top-left)
+          else img+k-lines
 
 ;; add-k-lines/inner-fractal/layer :
 ;; Image Natural Color Posn Posn ... ... #:cutoff PosReal -> Image
@@ -96,10 +101,12 @@ define (add-k-line/inner-fractal/layer img p1 p2 layer color #:cutoff line-cutof
 ;; add-half-k-line/inner-fractal/layer :
 ;; Image Posn Posn Natural Color #:cutoff PosReal -> Image
 define (add-half-k-line/inner-fractal/layer img p1 p2 layer color #:cutoff line-cutoff)
-  cond
-    {distance(p1 p2) <= line-cutoff}
-      cond [{layer = 0} (add-simple-line/color img p1 p2 color)]
-           [else img]
+  my-cond
+    if {distance(p1 p2) <= line-cutoff}
+      my-cond
+        if {layer = 0}
+          (add-simple-line/color img p1 p2 color)
+        else img
     else
       define ∆p (∆ p1 p2)
       define mid-point
@@ -111,13 +118,14 @@ define (add-half-k-line/inner-fractal/layer img p1 p2 layer color #:cutoff line-
       define mid-right
         {mid-left + {1/3 * ∆p}}
       define img2
-        cond [{layer = 0}
-              (add-simple-line/color
-               img p1 p2 color)]
-             [else
-              (add-half-k-lines/inner-fractal/layer
-               #:cutoff line-cutoff
-               img {layer - 1} color p1 top top p2)]
+        my-cond
+          if {layer = 0}
+            (add-simple-line/color
+             img p1 p2 color)
+          else
+            (add-half-k-lines/inner-fractal/layer
+             #:cutoff line-cutoff
+             img {layer - 1} color p1 top top p2)
       (add-k-lines/inner-fractal/layer
        #:cutoff line-cutoff
        img2
