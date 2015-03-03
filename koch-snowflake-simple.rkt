@@ -8,6 +8,7 @@ require 2htdp/image
         racket/local
         racket/match
         racket/list
+        syntax/parse/define
         postfix-dot-notation
         my-cond/iffy
         "posn.rkt"
@@ -29,24 +30,26 @@ define (snowflake w #:cutoff [line-cutoff default-line-cutoff])
   define top
     posn {m + {1/2 * w}}
          m
-  (add-k-lines
-   MTS
-   bottom-left top
-   top bottom-right
-   bottom-right bottom-left
-   #:cutoff line-cutoff)
+  add-k-lines MTS #:cutoff line-cutoff
+    bottom-left top
+    top bottom-right
+    bottom-right bottom-left
 
-;; add-k-lines : Image Posn Posn ... ... #:cutoff PosReal -> Image
-define (add-k-lines scene #:cutoff line-cutoff . rst-args)
-  match rst-args
-    [(list) scene]
-    [(list-rest start stop rst)
-     (apply add-k-lines (add-k-line scene start stop #:cutoff line-cutoff) rst #:cutoff line-cutoff)]
+;; add-k-lines : Image #:cutoff PosReal [Posn Posn] ...  -> Image
+define-simple-macro
+  add-k-lines img-expr #:cutoff line-cutoff-expr
+    start-expr stop-expr
+    ...
+  let ([line-cutoff line-cutoff-expr])
+    for/fold ([img img-expr]) ([start in-list(list(start-expr ...))]
+                               [stop  in-list(list(stop-expr  ...))])
+      add-k-line img start stop #:cutoff line-cutoff
 
 define (add-k-line img p1 p2 #:cutoff line-cutoff)
   my-cond
     if {distance(p1 p2) <= line-cutoff}
-      (add-simple-line/color img p1 p2 "black")
+      add-simple-lines/color img "black"
+        p1 p2
     else
       define ∆p (∆ p1 p2)
       define mid-point
@@ -57,11 +60,9 @@ define (add-k-line img p1 p2 #:cutoff line-cutoff)
         {p1 + {1/3 * ∆p}}
       define mid-right
         {mid-left + {1/3 * ∆p}}
-      (add-k-lines
-       #:cutoff line-cutoff
-       img
-       p1 mid-left
-       mid-left top
-       top mid-right
-       mid-right p2)
+      add-k-lines img #:cutoff line-cutoff
+        p1 mid-left
+        mid-left top
+        top mid-right
+        mid-right p2
 
