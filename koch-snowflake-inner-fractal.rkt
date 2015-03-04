@@ -13,7 +13,6 @@ require 2htdp/image
         racket/list
         syntax/parse/define
         postfix-dot-notation
-        my-cond
         my-cond/iffy
         "posn.rkt"
         "utils.rkt"
@@ -54,19 +53,17 @@ define (snowflake/inner-fractal/multi-color w colors #:cutoff [line-cutoff defau
     my-cond
       if (equal? "transparent" color)
         img
-      else
-        define img+k-lines
-          add-k-lines/inner-fractal/layer img layer color #:cutoff line-cutoff
-            bottom-left top
-            top bottom-right
-            bottom-right bottom-left
-        my-cond
-          if {layer = 0}
-            add-simple-lines/color img+k-lines color
-              top-left top-right
-              top-right bottom
-              bottom top-left
-          else img+k-lines
+      define img+k-lines
+        add-k-lines/inner-fractal/layer img layer color #:cutoff line-cutoff
+          bottom-left top
+          top bottom-right
+          bottom-right bottom-left
+      else-if {layer = 0}
+        add-simple-lines/color img+k-lines color
+          top-left top-right
+          top-right bottom
+          bottom top-left
+      else img+k-lines
 
 ;; add-k-lines/inner-fractal/layer :
 ;; Image Natural Color #:cutoff PosReal [Posn Posn] ...  -> Image
