@@ -12,29 +12,30 @@ require 2htdp/image
         "utils.rkt"
 
 module+ test
-  freeze
+  require syntax/parse/define
+  define-simple-macro
+    images img-expr:expr ...
+    begin 
+      let ()
+        printf("time(img-expr)    : ")
+        define img time(img-expr)
+        printf("time(freeze(img)) : ")
+        time(freeze(img))
+      ...
+  images
     snowflake 728
-  freeze
     snowflake/inner-fractal 728
-  freeze
     snowflake/inner-fractal/multi-color 150 '("transparent" "black") ; inside-out-ish
-  freeze
     snowflake/inner-fractal/multi-color 500 '("red" "green") #:cutoff 12 ; 2-color
-  freeze
     snowflake/inner-fractal/multi-color 500 '("red" "blue" "green") #:cutoff 12 ; 3-color
-  freeze
     snowflake/inner-fractal/multi-color 100 '("red" "blue" "green" "orange") #:cutoff 12 ; 4-color
-  freeze
     snowflake/inner-fractal/multi-color 500 '("red" "orange" "yellow" "green" "blue" "purple")
                                         #:cutoff 10 ; 6-color
-  freeze
     snowflake/inner-fractal/multi-color 500 '("red" "transparent" "yellow" "green" "blue" "purple")
                                         #:cutoff 10 ; 6-color-minus-orange
-  freeze
     snowflake/inner-fractal/multi-color 500 '("red" "transparent" "yellow" "transparent" "green"
                                                     "transparent" "blue" "transparent" "purple")
                                         #:cutoff 10 ; 5-color-odd-layers
-  freeze
     add-k-line empty-scene(1020 520) #:cutoff default-line-cutoff
                posn(10 510)
                posn(1010 510)
