@@ -22,6 +22,7 @@ define (snowflake/inner-fractal n #:cutoff [line-cutoff default-line-cutoff])
   (snowflake/inner-fractal/multi-color n '("black") #:cutoff line-cutoff)
 
 ;; snowflake/inner-fractal/multi-color : Positive-Real (Listof Color) -> Image
+;; example: (snowflake/inner-fractal/multi-color 500 '("red" "green"))
 define (snowflake/inner-fractal/multi-color w colors #:cutoff [line-cutoff default-line-cutoff])
   define h {w * 4/3 * √3/2}
   ;; r1 = h/2
@@ -98,32 +99,28 @@ define (add-k-line/inner-fractal/layer img p1 p2 layer color #:cutoff line-cutof
 ;; add-half-k-line/inner-fractal/layer :
 ;; Image Posn Posn Natural Color #:cutoff PosReal -> Image
 define (add-half-k-line/inner-fractal/layer img p1 p2 layer color #:cutoff line-cutoff)
+  define ∆p (∆ p1 p2)
+  define mid-point
+    {p1 + {1/2 * ∆p}}
+  define top
+    {mid-point + {√3/6 * (posn ∆p.y (- ∆p.x))}}
+  define mid-left
+    {p1 + {1/3 * ∆p}}
+  define mid-right
+    {mid-left + {1/3 * ∆p}}
+  define img2
+    my-cond
+      if {layer = 0}
+        add-simple-lines/color img color
+          p1 p2
+      else
+        add-half-k-lines/inner-fractal/layer img {layer - 1} color #:cutoff line-cutoff
+          p1 top
+          top p2
   my-cond
     if {distance(p1 p2) <= line-cutoff}
-      my-cond
-        if {layer = 0}
-          add-simple-lines/color img color
-            p1 p2
-        else img
+      img2
     else
-      define ∆p (∆ p1 p2)
-      define mid-point
-        {p1 + {1/2 * ∆p}}
-      define top
-        {mid-point + {√3/6 * (posn ∆p.y (- ∆p.x))}}
-      define mid-left
-        {p1 + {1/3 * ∆p}}
-      define mid-right
-        {mid-left + {1/3 * ∆p}}
-      define img2
-        my-cond
-          if {layer = 0}
-            add-simple-lines/color img color
-              p1 p2
-          else
-            add-half-k-lines/inner-fractal/layer img {layer - 1} color #:cutoff line-cutoff
-              p1 top
-              top p2
       add-k-lines/inner-fractal/layer img2 layer color #:cutoff line-cutoff
         p1 mid-left
         mid-left top
