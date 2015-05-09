@@ -1,11 +1,10 @@
-#lang sweet-exp racket/base
+#lang postfix-dot-notation sweet-exp racket/base
 
 provide all-defined-out()
 
 require racket/match
         racket/math
         math/base
-        postfix-dot-notation
         prefix-in rkt: racket/base
 
 struct posn (x y) #:transparent #:extra-constructor-name make-posn

@@ -1,4 +1,4 @@
-#lang sweet-exp racket/base
+#lang postfix-dot-notation sweet-exp racket/base
 
 provide snowflake
         add-k-lines
@@ -9,7 +9,6 @@ require 2htdp/image
         racket/match
         racket/list
         syntax/parse/define
-        postfix-dot-notation
         my-cond/iffy
         "posn.rkt"
         "utils.rkt"

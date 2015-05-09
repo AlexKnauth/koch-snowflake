@@ -1,4 +1,4 @@
-#lang sweet-exp racket/base
+#lang postfix-dot-notation sweet-exp racket/base
 
 provide all-defined-out()
 
@@ -6,7 +6,6 @@ require 2htdp/image
         racket/match
         syntax/parse/define
         my-cond/iffy
-        postfix-dot-notation
         "posn.rkt"
 
 define default-line-cutoff 4
