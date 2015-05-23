@@ -6,6 +6,11 @@ require 2htdp/image
         koch-snowflake/utils
         koch-snowflake/posn
         math/base
+module+ test
+  require racket/runtime-path
+          mrlib/gif
+          mrlib/image-core
+          only-in racket/draw make-bitmap
 
 define cutoff 11
 
@@ -46,6 +51,25 @@ module+ test
       values
         t
         freeze serpinski-star(200 "purple" {t * 2pi/360})
+  hash-ref hsh 90 ; ∆a = 90
+  define bms
+    for/list ([t (in-range 0 360 2)])
+      define img
+        hash-ref hsh t
+      define bm make-bitmap(img.image-height img.image-width #f)
+      define dc (send bm make-dc)
+      render-image(img dc 0 0)
+      bm
+  define-runtime-path images/serpinski-star-anim-delta-a-gif
+    "images/serpinski-star-anim-delta-a.gif"
+  when file-exists?(images/serpinski-star-anim-delta-a-gif)
+    delete-file(images/serpinski-star-anim-delta-a-gif)
+  write-animated-gif
+    bms
+    3
+    images/serpinski-star-anim-delta-a-gif
+    #:loop? #t
+    #:last-frame-delay 3
   animate
     λ (t)
       hash-ref hsh
