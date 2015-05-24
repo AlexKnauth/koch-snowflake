@@ -25,8 +25,8 @@ define serpinski-star(r color ∆a)
 define add-serpinski-star*(img r color t ∆a)
   define img2
     for/fold ([img img]) ([i (in-range 5)])
-      define a1 {2 * pi * {{i - 1} / 5}}
-      define a2 {2 * pi * {{i + 1} / 5}}
+      define a1 {{2 * pi * {{i - 1} / 5}} + ∆a}
+      define a2 {{2 * pi * {{i + 1} / 5}} + ∆a}
       define p1 t{r * posn(cos(a1) sin(a1))}
       define p2 t{r * posn(cos(a2) sin(a2))}
       add-simple-lines/color img color
@@ -51,6 +51,7 @@ module+ test
       values
         t
         freeze serpinski-star(200 "purple" {t * 2pi/360})
+  hash-ref hsh 84 ; ∆a = 84
   hash-ref hsh 90 ; ∆a = 90
   define bms
     for/list ([t (in-range 0 360 2)])
