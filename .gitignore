@@ -2,6 +2,10 @@
 compiled/
 doc/
 
+# Rust-generated files
+target/
+*.lock
+
 # Editor-generated files
 *~
 \#*
