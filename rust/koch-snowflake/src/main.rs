@@ -41,8 +41,8 @@ fn main() {
     koch_snowflake_cave2(&mut img_snowflake_cave2, (364f32, 364f32), 359f32, BLACK);
     img_snowflake_cave2.save("koch_snowflake_cave2.png").unwrap();
     let mut img_layered_rc = LayeredImage::from_pixels(728, 728, vec![TRANSPARENT, TRANSPARENT, WHITE]);
-    img_layered_rc.on_layer(0, |img| koch_snowflake_reflections(img, (364f32, 364f32), 359f32, BLUE));
-    img_layered_rc.on_layer(1, |img| koch_snowflake_cave(img, (364f32, 364f32), 359f32, ORANGE));
+    img_layered_rc.on_layer(1, |img| koch_snowflake_reflections2(img, (364f32, 364f32), 359f32, BLUE));
+    img_layered_rc.on_layer(0, |img| koch_snowflake_cave(img, (364f32, 364f32), 359f32, GOLD));
     img_layered_rc.save("koch_snowflake_layered_rc.png").unwrap();
 }
 
