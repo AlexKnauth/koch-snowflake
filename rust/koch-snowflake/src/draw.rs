@@ -13,8 +13,11 @@ pub const TRANSPARENT: Color = Rgba([0, 0, 0, 0]);
 pub const WHITE: Color = Rgba([255u8, 255u8, 255u8, 255u8]);
 pub const BLACK: Color = Rgba([0u8, 0u8, 0u8, 255u8]);
 pub const RED: Color = Rgba([255u8, 0u8, 0u8, 255u8]);
+pub const ORANGE: Color = Rgba([255u8, 127u8, 0u8, 255u8]);
+pub const YELLOW: Color = Rgba([255u8, 255u8, 0u8, 255u8]);
 pub const GREEN: Color = Rgba([0u8, 255u8, 0u8, 255u8]);
 pub const BLUE: Color = Rgba([0u8, 0u8, 255u8, 255u8]);
+pub const PURPLE: Color = Rgba([128u8, 0u8, 128u8, 255u8]);
 pub const GOLD: Color = Rgba([255u8, 215, 0u8, 255u8]);
 
 pub fn draw_line_segment_mut(img: &mut RgbaImage, a: Pos, b: Pos, c: Color) {
