@@ -44,6 +44,12 @@ fn main() {
     img_layered_rc.on_layer(1, |img| koch_snowflake_reflections2(img, (364f32, 364f32), 359f32, BLUE));
     img_layered_rc.on_layer(0, |img| koch_snowflake_cave(img, (364f32, 364f32), 359f32, GOLD));
     img_layered_rc.save("koch_snowflake_layered_rc.png").unwrap();
+    let mut img_reflected_layered2 = LayeredImage::from_pixels(728, 728, vec![TRANSPARENT, TRANSPARENT, WHITE]);
+    koch_snowflake_reflections_layered(&mut img_reflected_layered2, (364f32, 364f32), 300f32, vec![RED, GREEN]);
+    img_reflected_layered2.save("koch_snowflake_reflected_layered2.png").unwrap();
+    let mut img_reflected_layered3 = LayeredImage::from_pixels(728, 728, vec![TRANSPARENT, TRANSPARENT, TRANSPARENT, WHITE]);
+    koch_snowflake_reflections_layered(&mut img_reflected_layered3, (364f32, 364f32), 300f32, vec![RED, BLUE, GREEN]);
+    img_reflected_layered3.save("koch_snowflake_reflected_layered3.png").unwrap();
 }
 
 fn koch_snowflake(img: &mut RgbaImage, center: Pos, radius: f32, color: Color) {
@@ -98,6 +104,18 @@ fn koch_snowflake_reflections2(img: &mut RgbaImage, center: Pos, radius: f32, co
     koch_curve_reflected2(img, t, br, color);
     koch_curve_reflected2(img, br, bl, color);
     koch_curve_reflected2(img, bl, t, color);
+}
+
+fn koch_snowflake_reflections_layered(img: &mut LayeredImage, center: Pos, radius: f32, colors: Vec<Color>) {
+    let ct = (0f32, -radius);
+    let cl = pos_rotate(ct, FRAC_TAU_3);
+    let cr = pos_rotate(ct, -FRAC_TAU_3);
+    let t = pos_plus(center, ct);
+    let bl = pos_plus(center, cl);
+    let br = pos_plus(center, cr);
+    koch_curve_reflected_layered(img, t, br, 0, &colors);
+    koch_curve_reflected_layered(img, br, bl, 0, &colors);
+    koch_curve_reflected_layered(img, bl, t, 0, &colors);
 }
 
 fn koch_snowflake_cave2(img: &mut RgbaImage, center: Pos, radius: f32, color: Color) {
@@ -199,5 +217,29 @@ fn koch_curve_reflected2(img: &mut RgbaImage, a: Pos, b: Pos, c: Color) {
         koch_curve_reflected2(img, t, r, c);
         koch_curve_reflected2(img, v, r, c);
         koch_curve_reflected2(img, r, b, c);
+    }
+}
+
+fn koch_curve_reflected_layered(img: &mut LayeredImage, a: Pos, b: Pos, n: usize, cs: &[Color]) {
+    if cs.len() <= n { return; }
+    let ab = pos_delta(a, b);
+    if pos_dist1(ab) <= DEFAULT_LINE_CUTOFF {
+        img.on_layer(n, |i| draw_line_segment_mut(i, a, b, cs[n]));
+    } else {
+        let ab3 = pos_div(ab, 3f32);
+        let l = pos_plus(a, ab3);
+        let t = pos_plus(l, pos_rotate(ab3, FRAC_TAU_6));
+        let v = pos_plus(l, pos_rotate(ab3, -FRAC_TAU_6));
+        let r = pos_plus(l, ab3);
+        koch_curve_reflected_layered(img, a, t, n+1, cs);
+        koch_curve_reflected_layered(img, a, v, n+1, cs);
+        koch_curve_reflected_layered(img, t, b, n+1, cs);
+        koch_curve_reflected_layered(img, v, b, n+1, cs);
+        koch_curve_reflected_layered(img, a, l, n, cs);
+        koch_curve_reflected_layered(img, l, t, n, cs);
+        koch_curve_reflected_layered(img, l, v, n, cs);
+        koch_curve_reflected_layered(img, t, r, n, cs);
+        koch_curve_reflected_layered(img, v, r, n, cs);
+        koch_curve_reflected_layered(img, r, b, n, cs);
     }
 }
