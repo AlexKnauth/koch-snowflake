@@ -51,8 +51,11 @@ fn main() {
     koch_snowflake_reflections_layered(&mut img_reflected_layered3, (364f32, 364f32), 300f32, vec![RED, BLUE, GREEN]);
     img_reflected_layered3.save("koch_snowflake_reflected_layered3.png").unwrap();
     let mut img_reflected_layered6 = LayeredImage::from_pixels(728, 728, vec![TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, WHITE]);
-    koch_snowflake_reflections_layered(&mut img_reflected_layered6, (364f32, 364f32), 250f32, vec![RED, ORANGE, YELLOW, BLUE, GREEN, PURPLE]);
+    koch_snowflake_reflections_layered(&mut img_reflected_layered6, (364f32, 364f32), 250f32, vec![RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE]);
     img_reflected_layered6.save("koch_snowflake_reflected_layered6.png").unwrap();
+    let mut img_reflected_layered_odd5 = LayeredImage::from_pixels(728, 728, vec![TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, WHITE]);
+    koch_snowflake_reflections_layered(&mut img_reflected_layered_odd5, (364f32, 364f32), 250f32, vec![RED, TRANSPARENT, YELLOW, TRANSPARENT, GREEN, TRANSPARENT, BLUE, TRANSPARENT, PURPLE]);
+    img_reflected_layered_odd5.save("koch_snowflake_reflected_layered_odd5.png").unwrap();
 }
 
 fn koch_snowflake(img: &mut RgbaImage, center: Pos, radius: f32, color: Color) {
