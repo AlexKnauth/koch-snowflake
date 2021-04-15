@@ -9,40 +9,40 @@ use draw::*;
 const DEFAULT_LINE_CUTOFF: f32 = 4f32;
 
 fn main() {
-    let mut img = RgbImage::from_pixel(728, 728, WHITE);
+    let mut img = RgbaImage::from_pixel(728, 728, WHITE);
     koch_curve(&mut img, (5f32, 5f32), (723f32, 723f32), BLACK);
     img.save("koch_curve.png").unwrap();
-    let mut img_cave = RgbImage::from_pixel(728, 728, WHITE);
+    let mut img_cave = RgbaImage::from_pixel(728, 728, WHITE);
     koch_curve_cave(&mut img_cave, (5f32, 5f32), (723f32, 723f32), BLACK);
     img_cave.save("koch_curve_cave.png").unwrap();
-    let mut img_cave2 = RgbImage::from_pixel(728, 728, WHITE);
+    let mut img_cave2 = RgbaImage::from_pixel(728, 728, WHITE);
     koch_curve_cave2(&mut img_cave2, (5f32, 5f32), (723f32, 723f32), BLACK);
     koch_curve_cave2(&mut img_cave2, (723f32, 723f32), (5f32, 5f32), BLACK);
     img_cave2.save("koch_curve_cave2.png").unwrap();
-    let mut img_reflected = RgbImage::from_pixel(728, 728, WHITE);
+    let mut img_reflected = RgbaImage::from_pixel(728, 728, WHITE);
     koch_curve_reflected(&mut img_reflected, (5f32, 5f32), (723f32, 723f32), BLACK);
     img_reflected.save("koch_curve_reflected.png").unwrap();
-    let mut img_reflected2 = RgbImage::from_pixel(728, 728, WHITE);
+    let mut img_reflected2 = RgbaImage::from_pixel(728, 728, WHITE);
     koch_curve_reflected2(&mut img_reflected2, (5f32, 5f32), (723f32, 723f32), BLACK);
     img_reflected2.save("koch_curve_reflected2.png").unwrap();
-    let mut img_snowflake = RgbImage::from_pixel(728, 728, WHITE);
+    let mut img_snowflake = RgbaImage::from_pixel(728, 728, WHITE);
     koch_snowflake(&mut img_snowflake, (364f32, 364f32), 359f32, BLACK);
     img_snowflake.save("koch_snowflake.png").unwrap();
-    let mut img_snowflake_reflections = RgbImage::from_pixel(728, 728, WHITE);
+    let mut img_snowflake_reflections = RgbaImage::from_pixel(728, 728, WHITE);
     koch_snowflake_reflections(&mut img_snowflake_reflections, (364f32, 364f32), 359f32, BLACK);
     img_snowflake_reflections.save("koch_snowflake_reflections.png").unwrap();
-    let mut img_snowflake_cave = RgbImage::from_pixel(728, 728, WHITE);
+    let mut img_snowflake_cave = RgbaImage::from_pixel(728, 728, WHITE);
     koch_snowflake_cave(&mut img_snowflake_cave, (364f32, 364f32), 359f32, BLACK);
     img_snowflake_cave.save("koch_snowflake_cave.png").unwrap();
-    let mut img_snowflake_reflections2 = RgbImage::from_pixel(728, 728, WHITE);
+    let mut img_snowflake_reflections2 = RgbaImage::from_pixel(728, 728, WHITE);
     koch_snowflake_reflections2(&mut img_snowflake_reflections2, (364f32, 364f32), 359f32, BLACK);
     img_snowflake_reflections2.save("koch_snowflake_reflections2.png").unwrap();
-    let mut img_snowflake_cave2 = RgbImage::from_pixel(728, 728, WHITE);
+    let mut img_snowflake_cave2 = RgbaImage::from_pixel(728, 728, WHITE);
     koch_snowflake_cave2(&mut img_snowflake_cave2, (364f32, 364f32), 359f32, BLACK);
     img_snowflake_cave2.save("koch_snowflake_cave2.png").unwrap();
 }
 
-fn koch_snowflake(img: &mut RgbImage, center: Pos, radius: f32, color: Color) {
+fn koch_snowflake(img: &mut RgbaImage, center: Pos, radius: f32, color: Color) {
     let ct = (0f32, -radius);
     let cl = pos_rotate(ct, FRAC_TAU_3);
     let cr = pos_rotate(ct, -FRAC_TAU_3);
@@ -54,7 +54,7 @@ fn koch_snowflake(img: &mut RgbImage, center: Pos, radius: f32, color: Color) {
     koch_curve(img, bl, t, color);
 }
 
-fn koch_snowflake_reflections(img: &mut RgbImage, center: Pos, radius: f32, color: Color) {
+fn koch_snowflake_reflections(img: &mut RgbaImage, center: Pos, radius: f32, color: Color) {
     let ct = (0f32, -radius);
     let cl = pos_rotate(ct, FRAC_TAU_3);
     let cr = pos_rotate(ct, -FRAC_TAU_3);
@@ -72,7 +72,7 @@ fn koch_snowflake_reflections(img: &mut RgbImage, center: Pos, radius: f32, colo
     koch_curve_reflected(img, bl, t, color);
 }
 
-fn koch_snowflake_cave(img: &mut RgbImage, center: Pos, radius: f32, color: Color) {
+fn koch_snowflake_cave(img: &mut RgbaImage, center: Pos, radius: f32, color: Color) {
     let ct = (0f32, -radius);
     let cl = pos_rotate(ct, FRAC_TAU_3);
     let cr = pos_rotate(ct, -FRAC_TAU_3);
@@ -84,7 +84,7 @@ fn koch_snowflake_cave(img: &mut RgbImage, center: Pos, radius: f32, color: Colo
     koch_curve_cave(img, bl, t, color);
 }
 
-fn koch_snowflake_reflections2(img: &mut RgbImage, center: Pos, radius: f32, color: Color) {
+fn koch_snowflake_reflections2(img: &mut RgbaImage, center: Pos, radius: f32, color: Color) {
     let ct = (0f32, -radius);
     let cl = pos_rotate(ct, FRAC_TAU_3);
     let cr = pos_rotate(ct, -FRAC_TAU_3);
@@ -96,7 +96,7 @@ fn koch_snowflake_reflections2(img: &mut RgbImage, center: Pos, radius: f32, col
     koch_curve_reflected2(img, bl, t, color);
 }
 
-fn koch_snowflake_cave2(img: &mut RgbImage, center: Pos, radius: f32, color: Color) {
+fn koch_snowflake_cave2(img: &mut RgbaImage, center: Pos, radius: f32, color: Color) {
     let ct = (0f32, -radius);
     let cl = pos_rotate(ct, FRAC_TAU_3);
     let cr = pos_rotate(ct, -FRAC_TAU_3);
@@ -111,7 +111,7 @@ fn koch_snowflake_cave2(img: &mut RgbImage, center: Pos, radius: f32, color: Col
     koch_curve_cave2(img, t, bl, color);
 }
 
-fn koch_curve(img: &mut RgbImage, a: Pos, b: Pos, c: Color) {
+fn koch_curve(img: &mut RgbaImage, a: Pos, b: Pos, c: Color) {
     let ab = pos_delta(a, b);
     if pos_dist1(ab) <= DEFAULT_LINE_CUTOFF {
         draw_line_segment_mut(img, a, b, c)
@@ -127,7 +127,7 @@ fn koch_curve(img: &mut RgbImage, a: Pos, b: Pos, c: Color) {
     }
 }
 
-fn koch_curve_cave(img: &mut RgbImage, a: Pos, b: Pos, c: Color) {
+fn koch_curve_cave(img: &mut RgbaImage, a: Pos, b: Pos, c: Color) {
     let ab = pos_delta(a, b);
     if pos_dist1(ab) <= DEFAULT_LINE_CUTOFF {
         draw_line_segment_mut(img, a, b, c)
@@ -142,7 +142,7 @@ fn koch_curve_cave(img: &mut RgbImage, a: Pos, b: Pos, c: Color) {
     }
 }
 
-fn koch_curve_cave2(img: &mut RgbImage, a: Pos, b: Pos, c: Color) {
+fn koch_curve_cave2(img: &mut RgbaImage, a: Pos, b: Pos, c: Color) {
     let ab = pos_delta(a, b);
     if pos_dist1(ab) <= DEFAULT_LINE_CUTOFF {
         draw_line_segment_mut(img, a, b, c)
@@ -158,7 +158,7 @@ fn koch_curve_cave2(img: &mut RgbImage, a: Pos, b: Pos, c: Color) {
     }
 }
 
-fn koch_curve_reflected(img: &mut RgbImage, a: Pos, b: Pos, c: Color) {
+fn koch_curve_reflected(img: &mut RgbaImage, a: Pos, b: Pos, c: Color) {
     let ab = pos_delta(a, b);
     if pos_dist1(ab) <= DEFAULT_LINE_CUTOFF {
         draw_line_segment_mut(img, a, b, c)
@@ -178,7 +178,7 @@ fn koch_curve_reflected(img: &mut RgbImage, a: Pos, b: Pos, c: Color) {
     }
 }
 
-fn koch_curve_reflected2(img: &mut RgbImage, a: Pos, b: Pos, c: Color) {
+fn koch_curve_reflected2(img: &mut RgbaImage, a: Pos, b: Pos, c: Color) {
     let ab = pos_delta(a, b);
     if pos_dist1(ab) <= DEFAULT_LINE_CUTOFF {
         draw_line_segment_mut(img, a, b, c)
