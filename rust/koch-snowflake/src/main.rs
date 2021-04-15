@@ -1,25 +1,12 @@
 extern crate image;
 extern crate imageproc;
 mod pos;
+mod draw;
 
-use image::{Rgb, RgbImage};
-use imageproc::drawing::draw_antialiased_line_segment_mut;
-use imageproc::pixelops::interpolate;
 use pos::*;
-
-type Color = Rgb<u8>;
+use draw::*;
 
 const DEFAULT_LINE_CUTOFF: f32 = 4f32;
-const WHITE: Color = Rgb([255u8, 255u8, 255u8]);
-const BLACK: Color = Rgb([0u8, 0u8, 0u8]);
-
-fn draw_line_segment_mut(img: &mut RgbImage, a: Pos, b: Pos, c: Color) {
-    draw_antialiased_line_segment_mut(img,
-        pos_round_i32(a),
-        pos_round_i32(b),
-        c,
-        interpolate);
-}
 
 fn main() {
     let mut img = RgbImage::from_pixel(728, 728, WHITE);
