@@ -56,6 +56,12 @@ fn main() {
     let mut img_reflected_layered_odd5 = LayeredImage::from_pixels(728, 728, vec![TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, WHITE]);
     koch_snowflake_reflections_layered(&mut img_reflected_layered_odd5, (364f32, 364f32), 250f32, vec![RED, TRANSPARENT, YELLOW, TRANSPARENT, GREEN, TRANSPARENT, BLUE, TRANSPARENT, PURPLE]);
     img_reflected_layered_odd5.save("koch_snowflake_reflected_layered_odd5.png").unwrap();
+    let mut img_cave_layered2 = LayeredImage::from_pixels(728, 728, vec![TRANSPARENT, TRANSPARENT, WHITE]);
+    koch_snowflake_cave_layered(&mut img_cave_layered2, (364f32, 364f32), 300f32, vec![BLUE, YELLOW]);
+    img_cave_layered2.save("koch_snowflake_cave_layered2.png").unwrap();
+    let mut img_cave_layered3 = LayeredImage::from_pixels(728, 728, vec![TRANSPARENT, TRANSPARENT, WHITE]);
+    koch_snowflake_cave_layered(&mut img_cave_layered3, (364f32, 364f32), 300f32, vec![PURPLE, GREEN, ORANGE]);
+    img_cave_layered3.save("koch_snowflake_cave_layered3.png").unwrap();
 }
 
 fn koch_snowflake(img: &mut RgbaImage, center: Pos, radius: f32, color: Color) {
@@ -122,6 +128,18 @@ fn koch_snowflake_reflections_layered(img: &mut LayeredImage, center: Pos, radiu
     koch_curve_reflected_layered(img, t, br, 0, &colors);
     koch_curve_reflected_layered(img, br, bl, 0, &colors);
     koch_curve_reflected_layered(img, bl, t, 0, &colors);
+}
+
+fn koch_snowflake_cave_layered(img: &mut LayeredImage, center: Pos, radius: f32, colors: Vec<Color>) {
+    let ct = (0f32, -radius);
+    let cl = pos_rotate(ct, FRAC_TAU_3);
+    let cr = pos_rotate(ct, -FRAC_TAU_3);
+    let t = pos_plus(center, ct);
+    let bl = pos_plus(center, cl);
+    let br = pos_plus(center, cr);
+    koch_curve_cave_layered(img, t, br, 0, &colors);
+    koch_curve_cave_layered(img, br, bl, 0, &colors);
+    koch_curve_cave_layered(img, bl, t, 0, &colors);
 }
 
 fn koch_snowflake_cave2(img: &mut RgbaImage, center: Pos, radius: f32, color: Color) {
@@ -247,5 +265,28 @@ fn koch_curve_reflected_layered(img: &mut LayeredImage, a: Pos, b: Pos, n: usize
         koch_curve_reflected_layered(img, t, r, n, cs);
         koch_curve_reflected_layered(img, v, r, n, cs);
         koch_curve_reflected_layered(img, r, b, n, cs);
+    }
+}
+
+fn koch_curve_cave_layered(img: &mut LayeredImage, a: Pos, b: Pos, n: usize, cs: &[Color]) {
+    if cs.len() <= n { return; }
+    let ab = pos_delta(a, b);
+    if pos_dist1(ab) <= DEFAULT_LINE_CUTOFF {
+        img.on_layer(n, |i| draw_line_segment_mut(i, a, b, cs[n]));
+    } else {
+        let ab3 = pos_div(ab, 3f32);
+        let l = pos_plus(a, ab3);
+        let t = pos_plus(l, pos_rotate(ab3, FRAC_TAU_6));
+        let r = pos_plus(l, ab3);
+        let bl = pos_plus(a, pos_rotate(ab3, -FRAC_TAU_6));
+        let br = pos_plus(r, pos_rotate(ab3, -FRAC_TAU_6));
+        koch_curve_cave_layered(img, t, a, n+1, cs);
+        koch_curve_cave_layered(img, b, t, n+1, cs);
+        koch_curve_cave_layered(img, bl, r, n+1, cs);
+        koch_curve_cave_layered(img, l, br, n+1, cs);
+        koch_curve_cave_layered(img, a, l, n, cs);
+        koch_curve_cave_layered(img, l, t, n, cs);
+        koch_curve_cave_layered(img, t, r, n, cs);
+        koch_curve_cave_layered(img, r, b, n, cs);
     }
 }
