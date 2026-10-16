@@ -62,7 +62,7 @@ module+ test
       render-image(img dc 0 0)
       bm
   define-runtime-path images/serpinski-star-anim-delta-a-gif
-    "../images/serpinski-star-anim-delta-a.gif"
+    "../../images/serpinski-star-anim-delta-a.gif"
   when file-exists?(images/serpinski-star-anim-delta-a-gif)
     delete-file(images/serpinski-star-anim-delta-a-gif)
   write-animated-gif
