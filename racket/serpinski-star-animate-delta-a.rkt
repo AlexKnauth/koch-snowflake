@@ -47,14 +47,14 @@ define add-serpinski-star*(img r color t ∆a)
 module+ test
   define 2pi/360 {{2 * pi} / 360}
   define hsh
-    for/hash ([t (in-range 0 360 2)])
+    for/hash ([t (in-range 0 72 2)])
       values
         t
-        freeze serpinski-star(200 "purple" {t * 2pi/360})
-  hash-ref hsh 84 ; ∆a = 84
-  hash-ref hsh 90 ; ∆a = 90
+        freeze serpinski-star(100 "purple" {t * 2pi/360})
+  ;hash-ref hsh 84 ; ∆a = 84
+  ;hash-ref hsh 90 ; ∆a = 90
   define bms
-    for/list ([t (in-range 0 360 2)])
+    for/list ([t (in-range 0 72 2)])
       define img
         hash-ref hsh t
       define bm make-bitmap(img.image-height img.image-width #f)
@@ -62,7 +62,7 @@ module+ test
       render-image(img dc 0 0)
       bm
   define-runtime-path images/serpinski-star-anim-delta-a-gif
-    "images/serpinski-star-anim-delta-a.gif"
+    "../images/serpinski-star-anim-delta-a.gif"
   when file-exists?(images/serpinski-star-anim-delta-a-gif)
     delete-file(images/serpinski-star-anim-delta-a-gif)
   write-animated-gif
@@ -74,4 +74,4 @@ module+ test
   animate
     λ (t)
       hash-ref hsh
-        modulo {2 * exact-round(t)} 360
+        modulo {2 * exact-round(t)} 72
